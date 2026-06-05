@@ -480,6 +480,73 @@
         }
 
         
+        #projects-block {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 820px;
+            max-height: 70vh;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease-out;
+            overflow-y: auto;
+        }
+
+        .projects-title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .project-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .project-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .project-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #00ced1;
+        }
+
+        .project-description {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+
+        .project-link {
+            font-size: 12px;
+            color: #00ced1;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .project-link:hover {
+            color: #00f2fe;
+        }
+
+        
         #results-button-container {
             position: fixed;
             top: 20px;
@@ -533,22 +600,74 @@
         }
 
         
+        .down-arrow-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        .down-arrow {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .down-arrow:hover {
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.7);
+            transform: translateY(5px);
+        }
+
+        .down-arrow svg {
+            width: 24px;
+            height: 24px;
+            stroke: rgba(255, 255, 255, 0.7);
+            transition: all 0.3s;
+        }
+
+        .down-arrow:hover svg {
+            stroke: rgba(255, 255, 255, 1);
+            animation: bounce 0.6s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        
         .home-theme #profile-block,
-        .home-theme #skills-block {
+        .home-theme #skills-block,
+        .home-theme #projects-block {
             border-color: rgba(0, 195, 255, 0.5);
         }
 
         .hacker-theme #profile-block,
-        .hacker-theme #skills-block {
+        .hacker-theme #skills-block,
+        .hacker-theme #projects-block {
             border-color: rgba(0, 255, 0, 0.5);
         }
 
         .rain-theme #profile-block,
-        .rain-theme #skills-block {
+        .rain-theme #skills-block,
+        .rain-theme #projects-block {
             border-color: rgba(100, 149, 237, 0.5);
         }
-
-
 
         
         .glitch {
@@ -577,23 +696,6 @@
         }
 
         
-        .cursor-trail {
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-        }
-
-        .cursor-trail-dot {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: opacity 0.3s ease;
-        }
-
-        
         #start-screen {
             position: fixed;
             top: 0;
@@ -619,7 +721,7 @@
         
         @media (max-width: 430px) {
             
-            #profile-block, #skills-block {
+            #profile-block, #skills-block, #projects-block {
                 width: 90vw;
                 max-width: 350px;
                 min-height: 280px;
@@ -789,6 +891,20 @@
                 font-size: 18px;
                 padding: 0 20px;
             }
+
+            .down-arrow-container {
+                bottom: 20px;
+            }
+
+            .down-arrow {
+                width: 36px;
+                height: 36px;
+            }
+
+            .down-arrow svg {
+                width: 20px;
+                height: 20px;
+            }
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Retro+Gaming&display=swap" rel="stylesheet">
@@ -938,6 +1054,10 @@
         </div>
 
 
+        <div id="projects-block" class="hidden">
+            <h2 class="projects-title">Projects</h2>
+            <div id="projects-container"></div>
+        </div>
 
 
         <div class="top-controls">
@@ -953,6 +1073,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                 </svg>
                 <input id="transparency-slider" class="slider" type="range" min="0" max="1" step="0.01" value="0.7">
+            </div>
+        </div>
+
+        <div class="down-arrow-container">
+            <div class="down-arrow" id="scroll-arrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
             </div>
         </div>
     </div>
