@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const glitchOverlay = document.querySelector('.glitch-overlay');
   const profileBlock = document.getElementById('profile-block');
   const skillsBlock = document.getElementById('skills-block');
+  const projectsBlock = document.getElementById('projects-block');
   const pythonBar = document.getElementById('python-bar');
   const cppBar = document.getElementById('cpp-bar');
   const csharpBar = document.getElementById('csharp-bar');
@@ -41,7 +42,54 @@ document.addEventListener('DOMContentLoaded', () => {
   const profileContainer = document.querySelector('.profile-container');
   const socialIcons = document.querySelectorAll('.social-icon');
   const badges = document.querySelectorAll('.badge');
+  const scrollArrow = document.getElementById('scroll-arrow');
+  const projectsContainer = document.getElementById('projects-container');
 
+  // Projects data
+  const projects = [
+    {
+      name: 'Discord Bot Framework',
+      description: 'Advanced Discord bot with moderation and utility features built in Python.',
+      link: 'https://github.com/p27a'
+    },
+    {
+      name: 'Network Security Tool',
+      description: 'Penetration testing toolkit written in C++ for security analysis.',
+      link: 'https://github.com/p27a'
+    },
+    {
+      name: 'Game Engine',
+      description: 'Custom game engine built with C# and Unity for indie game development.',
+      link: 'https://github.com/p27a'
+    },
+    {
+      name: 'Data Analysis Platform',
+      description: 'Web platform for analyzing and visualizing large datasets in Python.',
+      link: 'https://github.com/p27a'
+    },
+    {
+      name: 'System Optimizer',
+      description: 'Windows system optimization tool written in C# and C++.',
+      link: 'https://github.com/p27a'
+    }
+  ];
+
+  // Populate projects
+  function populateProjects() {
+    projectsContainer.innerHTML = '';
+    projects.forEach(project => {
+      const projectEl = document.createElement('div');
+      projectEl.className = 'project-item';
+      projectEl.innerHTML = `
+        <div class="project-name">${project.name}</div>
+        <div class="project-description">${project.description}</div>
+        <a href="${project.link}" target="_blank" class="project-link">View on GitHub →</a>
+      `;
+      projectsContainer.appendChild(projectEl);
+    });
+  }
+
+  populateProjects();
   
   const cursor = document.querySelector('.custom-cursor');
   const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
@@ -181,6 +229,10 @@ document.addEventListener('DOMContentLoaded', () => {
       skillsBlock.style.borderOpacity = '0';
       skillsBlock.style.borderColor = 'transparent';
       skillsBlock.style.backdropFilter = 'none';
+      projectsBlock.style.background = 'rgba(0, 0, 0, 0)';
+      projectsBlock.style.borderOpacity = '0';
+      projectsBlock.style.borderColor = 'transparent';
+      projectsBlock.style.backdropFilter = 'none';
    
       profileBlock.style.pointerEvents = 'auto';
       socialIcons.forEach(icon => {
@@ -205,6 +257,10 @@ document.addEventListener('DOMContentLoaded', () => {
       skillsBlock.style.borderOpacity = opacity;
       skillsBlock.style.borderColor = '';
       skillsBlock.style.backdropFilter = `blur(${10 * opacity}px)`;
+      projectsBlock.style.background = `rgba(0, 0, 0, ${opacity})`;
+      projectsBlock.style.borderOpacity = opacity;
+      projectsBlock.style.borderColor = '';
+      projectsBlock.style.backdropFilter = `blur(${10 * opacity}px)`;
       profileBlock.style.pointerEvents = 'auto';
       socialIcons.forEach(icon => {
         icon.style.pointerEvents = 'auto';
@@ -266,6 +322,12 @@ document.addEventListener('DOMContentLoaded', () => {
     handleTilt(e, skillsBlock);
   });
 
+  projectsBlock.addEventListener('mousemove', (e) => handleTilt(e, projectsBlock));
+  projectsBlock.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    handleTilt(e, projectsBlock);
+  });
+
   profileBlock.addEventListener('mouseleave', () => {
     gsap.to(profileBlock, {
       rotationX: 0,
@@ -293,6 +355,23 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   skillsBlock.addEventListener('touchend', () => {
     gsap.to(skillsBlock, {
+      rotationX: 0,
+      rotationY: 0,
+      duration: 0.5,
+      ease: 'power2.out'
+    });
+  });
+
+  projectsBlock.addEventListener('mouseleave', () => {
+    gsap.to(projectsBlock, {
+      rotationX: 0,
+      rotationY: 0,
+      duration: 0.5,
+      ease: 'power2.out'
+    });
+  });
+  projectsBlock.addEventListener('touchend', () => {
+    gsap.to(projectsBlock, {
       rotationX: 0,
       rotationY: 0,
       duration: 0.5,
@@ -335,9 +414,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
  
-  let isShowingSkills = false;
+  let currentView = 'profile'; // profile, skills, or projects
+
   resultsButton.addEventListener('click', () => {
-    if (!isShowingSkills) {
+    if (currentView === 'profile') {
+      // Show skills
       gsap.to(profileBlock, {
         x: -100,
         opacity: 0,
@@ -355,16 +436,35 @@ document.addEventListener('DOMContentLoaded', () => {
           gsap.to(csharpBar, { width: '80%', duration: 2, ease: 'power2.out' });
         }
       });
-      resultsHint.classList.remove('hidden');
-      isShowingSkills = true;
-    } else {
+      currentView = 'skills';
+      resultsButton.textContent = 'Projects';
+    } else if (currentView === 'skills') {
+      // Show projects
       gsap.to(skillsBlock, {
-        x: 100,
+        x: -100,
         opacity: 0,
         duration: 0.5,
         ease: 'power2.in',
         onComplete: () => {
           skillsBlock.classList.add('hidden');
+          projectsBlock.classList.remove('hidden');
+          gsap.fromTo(projectsBlock,
+            { x: 100, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }
+          );
+        }
+      });
+      currentView = 'projects';
+      resultsButton.textContent = 'Profile';
+    } else {
+      // Back to profile
+      gsap.to(projectsBlock, {
+        x: 100,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.in',
+        onComplete: () => {
+          projectsBlock.classList.add('hidden');
           profileBlock.classList.remove('hidden');
           gsap.fromTo(profileBlock,
             { x: -100, opacity: 0 },
@@ -372,14 +472,15 @@ document.addEventListener('DOMContentLoaded', () => {
           );
         }
       });
-      resultsHint.classList.add('hidden');
-      isShowingSkills = false;
+      currentView = 'profile';
+      resultsButton.textContent = 'Skills';
     }
   });
 
   resultsButton.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    if (!isShowingSkills) {
+    if (currentView === 'profile') {
+      // Show skills
       gsap.to(profileBlock, {
         x: -100,
         opacity: 0,
@@ -397,16 +498,35 @@ document.addEventListener('DOMContentLoaded', () => {
           gsap.to(csharpBar, { width: '80%', duration: 2, ease: 'power2.out' });
         }
       });
-      resultsHint.classList.remove('hidden');
-      isShowingSkills = true;
-    } else {
+      currentView = 'skills';
+      resultsButton.textContent = 'Projects';
+    } else if (currentView === 'skills') {
+      // Show projects
       gsap.to(skillsBlock, {
-        x: 100,
+        x: -100,
         opacity: 0,
         duration: 0.5,
         ease: 'power2.in',
         onComplete: () => {
           skillsBlock.classList.add('hidden');
+          projectsBlock.classList.remove('hidden');
+          gsap.fromTo(projectsBlock,
+            { x: 100, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }
+          );
+        }
+      });
+      currentView = 'projects';
+      resultsButton.textContent = 'Profile';
+    } else {
+      // Back to profile
+      gsap.to(projectsBlock, {
+        x: 100,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.in',
+        onComplete: () => {
+          projectsBlock.classList.add('hidden');
           profileBlock.classList.remove('hidden');
           gsap.fromTo(profileBlock,
             { x: -100, opacity: 0 },
@@ -414,8 +534,132 @@ document.addEventListener('DOMContentLoaded', () => {
           );
         }
       });
-      resultsHint.classList.add('hidden');
-      isShowingSkills = false;
+      currentView = 'profile';
+      resultsButton.textContent = 'Skills';
+    }
+  });
+
+  // Arrow click handler
+  scrollArrow.addEventListener('click', () => {
+    if (currentView === 'profile') {
+      // Show skills
+      gsap.to(profileBlock, {
+        x: -100,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.in',
+        onComplete: () => {
+          profileBlock.classList.add('hidden');
+          skillsBlock.classList.remove('hidden');
+          gsap.fromTo(skillsBlock,
+            { x: 100, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }
+          );
+          gsap.to(pythonBar, { width: '87%', duration: 2, ease: 'power2.out' });
+          gsap.to(cppBar, { width: '75%', duration: 2, ease: 'power2.out' });
+          gsap.to(csharpBar, { width: '80%', duration: 2, ease: 'power2.out' });
+        }
+      });
+      currentView = 'skills';
+      resultsButton.textContent = 'Projects';
+    } else if (currentView === 'skills') {
+      // Show projects
+      gsap.to(skillsBlock, {
+        x: -100,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.in',
+        onComplete: () => {
+          skillsBlock.classList.add('hidden');
+          projectsBlock.classList.remove('hidden');
+          gsap.fromTo(projectsBlock,
+            { x: 100, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }
+          );
+        }
+      });
+      currentView = 'projects';
+      resultsButton.textContent = 'Profile';
+    } else {
+      // Back to profile
+      gsap.to(projectsBlock, {
+        x: 100,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.in',
+        onComplete: () => {
+          projectsBlock.classList.add('hidden');
+          profileBlock.classList.remove('hidden');
+          gsap.fromTo(profileBlock,
+            { x: -100, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }
+          );
+        }
+      });
+      currentView = 'profile';
+      resultsButton.textContent = 'Skills';
+    }
+  });
+
+  scrollArrow.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (currentView === 'profile') {
+      // Show skills
+      gsap.to(profileBlock, {
+        x: -100,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.in',
+        onComplete: () => {
+          profileBlock.classList.add('hidden');
+          skillsBlock.classList.remove('hidden');
+          gsap.fromTo(skillsBlock,
+            { x: 100, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }
+          );
+          gsap.to(pythonBar, { width: '87%', duration: 2, ease: 'power2.out' });
+          gsap.to(cppBar, { width: '75%', duration: 2, ease: 'power2.out' });
+          gsap.to(csharpBar, { width: '80%', duration: 2, ease: 'power2.out' });
+        }
+      });
+      currentView = 'skills';
+      resultsButton.textContent = 'Projects';
+    } else if (currentView === 'skills') {
+      // Show projects
+      gsap.to(skillsBlock, {
+        x: -100,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.in',
+        onComplete: () => {
+          skillsBlock.classList.add('hidden');
+          projectsBlock.classList.remove('hidden');
+          gsap.fromTo(projectsBlock,
+            { x: 100, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }
+          );
+        }
+      });
+      currentView = 'projects';
+      resultsButton.textContent = 'Profile';
+    } else {
+      // Back to profile
+      gsap.to(projectsBlock, {
+        x: 100,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.in',
+        onComplete: () => {
+          projectsBlock.classList.add('hidden');
+          profileBlock.classList.remove('hidden');
+          gsap.fromTo(profileBlock,
+            { x: -100, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }
+          );
+        }
+      });
+      currentView = 'profile';
+      resultsButton.textContent = 'Skills';
     }
   });
 });
